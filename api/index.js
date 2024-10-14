@@ -29,7 +29,7 @@ connectDB(URL);
 app.use(express.json());
 app.use(cors(
     {
-        origin: ["https://cryptic-cave-vercel.vercel.app",],
+        origin: ["https://www.linkuni.in"],
         methods: ["GET","POST","DELETE", "PUT"],
         credentials: true,
         // allowedHeaders:[],
