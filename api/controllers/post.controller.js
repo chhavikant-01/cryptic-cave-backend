@@ -111,7 +111,7 @@ export const updatePost = async (req,res,next) => {
       return res.status(404).json({ message: "Post doesn't exist!" });
     }
 
-    if(post.userId!==req.user.id){
+    if(post.userId.toString()!==req.user.id.toString()){
         return res.status(403).json({message: "You're not authorized to modify this post!"})
     }
     
@@ -121,12 +121,18 @@ export const updatePost = async (req,res,next) => {
     if (updates.desc !== undefined) {
       post.desc = updates.desc;
     }
-    if (updates.thumbnail !== undefined) {
-      post.thumbnail = updates.thumbnail;
+    if (updates.program !== undefined) {
+      post.category.program = updates.program;
     }
     if (updates.category !== undefined) {
       
-      post.category = { ...post.category, ...updates.category };
+      post.category.resourceType = updates.category.resourceType;
+    }
+    if (updates.course !== undefined) {
+      post.category.course = updates.course;
+    }
+    if(!updates.title && !updates.desc && !updates.program && !updates.course && !updates.category){
+      return res.status(400).json({message: "No updates provided!"})
     }
 
     await post.save();
@@ -411,4 +417,29 @@ export const downloadPost = async (req, res, next) => {
     res.status(500).json({ message: e.message });
   }
 };
+
+export const filterPost = async (req, res, next) => {
+  try {
+    const { program, course, resourceType, semester, fileType, sort, keyword } = req.body;
+    const posts = await Post.find({
+      ...(program && { "category.program": program }),
+      ...(course && { "category.course": course }),
+      ...(resourceType && { "category.resourceType": resourceType }),
+      ...(semester && { "category.semester": semester }),
+      ...(fileType && { fileType }),
+      ...(keyword && {
+        $or:[
+          {title: {$regex: keyword, $options: "i"}},
+          {desc: {$regex: keyword, $options: "i"}}
+        ]
+      }),
+    }).sort({ createdAt: sort === "asc" ? 1 : -1 });
+
+    res.status(200).json(posts);
+    
+  }catch(e){
+    res.status(500).json({message: e.message})
+  }
+
+}
 
