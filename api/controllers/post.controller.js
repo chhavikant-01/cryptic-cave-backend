@@ -7,7 +7,7 @@ import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import multer from 'multer';
 import multerS3 from 'multer-s3';
 import stream from 'stream';
-
+import getFilterPosts from "../utils/getFilterPosts.js";
 
 // Construct __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -421,25 +421,13 @@ export const downloadPost = async (req, res, next) => {
 export const filterPost = async (req, res, next) => {
   try {
     const { program, course, resourceType, semester, fileType, sort, keyword } = req.body;
-    const posts = await Post.find({
-      ...(program && { "category.program": program }),
-      ...(course && { "category.course": course }),
-      ...(resourceType && { "category.resourceType": resourceType }),
-      ...(semester && { "category.semester": semester }),
-      ...(fileType && { fileType }),
-      ...(keyword && {
-        $or:[
-          {title: {$regex: keyword, $options: "i"}},
-          {desc: {$regex: keyword, $options: "i"}}
-        ]
-      }),
-    }).sort({ createdAt: sort === "asc" ? 1 : -1 });
+
+    const posts = await getFilterPosts({ program, course, resourceType, semester, fileType, sort, keyword });
 
     res.status(200).json(posts);
-    
-  }catch(e){
-    res.status(500).json({message: e.message})
-  }
 
-}
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
