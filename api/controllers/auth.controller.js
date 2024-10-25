@@ -7,7 +7,7 @@ dotenv.config();
 
 export const signup = async (req, res, next) => {
     try {
-        const { firstname, lastname, email, password } = req.body;
+        const { firstname, lastname, email, password, program } = req.body;
         console.log(req.body);
         const userEmail = await User.findOne({ email });
         const userUsername = email.split("@")[0];
@@ -22,6 +22,7 @@ export const signup = async (req, res, next) => {
             email,
             password,
             username: userUsername,
+            program,
         };
 
         const createActivationToken = (user) => {
@@ -132,7 +133,7 @@ export const activation = async (req, res, next) => {
             return res.status(400).json({ message: "Invalid token" });
         }
 
-        const { firstname, lastname, email, password } = newUser;
+        const { firstname, lastname, email, password, program } = newUser;
 
         let user = await User.findOne({ email });
 
@@ -146,6 +147,7 @@ export const activation = async (req, res, next) => {
             email,
             password,
             username: email.split("@")[0],
+            program,
         });
 
         sendToken(user, 201, res);
