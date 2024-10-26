@@ -223,6 +223,34 @@ export const allPosts = async (req, res, next) => {
   }
 }
 
+export const userPosts = async (req,res,next) => {
+  try{
+    const user = await User.findById(req.params.userId)
+    if(!user){
+      return res.status(404).json({message: "User not found"})
+    }
+    const allPosts = await getPosts()
+    const posts = allPosts.filter(post => post.author._id.toString() === req.params.userId)
+    res.status(200).json(posts)
+  }catch(e){
+    console.log(e)
+  }
+}
+
+export const savedPosts = async (req,res,next) => {
+  try{
+    const user = await User.findById(req.params.userId)
+    if(!user){
+      return res.status(404).json({message: "User not found"})
+    }
+    const allPosts = await getPosts()
+    const posts = allPosts.filter(post => user.savedPosts.includes(post._id.toString()))
+    res.status(200).json(posts)
+  }catch(e){
+    console.log(e)
+  }
+}
+
 export const likePost = async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.postId);
@@ -243,18 +271,6 @@ export const likePost = async (req, res, next) => {
   }
 };
 
-export const userPosts = async (req,res,next) => {
-  try{
-    const user = await User.findById(req.params.userId)
-    if(!user){
-      return res.status(404).json({message: "User not found"})
-    }
-    const posts = await Post.find({userId: req.params.userId})
-    res.status(200).json(posts)
-  }catch(e){
-    res.status(500).json({message: e.message})
-  }
-}
 
 export const savePost = async (req, res, next) => {
   try {

@@ -13,7 +13,8 @@ import {
     // downloadFile,
     uploadPost,
     downloadPost,
-    filterPost
+    filterPost,
+    savedPosts
  } from "../controllers/post.controller.js"
  import multer from "multer";
  import path from "path";
@@ -48,6 +49,7 @@ const router = express.Router();
 
 router.get("/", allPosts)
 router.get("/all-post/:userId", userPosts)
+router.get("/saved/:userId", savedPosts)
 // router.post("/create-post", isAuthenticated, createPost)
 // router.get("/download/:fileName", isAuthenticated, downloadFile)
 router.get("/:postId", getPost)
