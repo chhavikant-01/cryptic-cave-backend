@@ -3,15 +3,11 @@ import User from "../models/user.model.js";
 import getPosts from "../utils/getPosts.js";
 import path from "path";
 import { fileURLToPath } from 'url';
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import multer from 'multer';
 import multerS3 from 'multer-s3';
 import stream from 'stream';
 import getFilterPosts from "../utils/getFilterPosts.js";
-
-// Construct __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const getAnonymousUserId = async () => {
   const anonymous = await User.findOne({ username: "anonymous" });
@@ -148,34 +144,6 @@ export const updatePost = async (req,res,next) => {
     }
 }
 
-export const deletePost = async (req, res, next) => {
-  try {
-    
-    const post = await Post.findById(req.params.postId);
-    if (!post) {
-      return res.status(404).json({ message: "Post doesn't exist!" });
-    }
-
-    if (req.user.id !== post.userId.toString()) {
-      return res.status(403).json({ message: "You're not allowed to delete this post" });
-    }
-
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found!" });
-    }
-
-    await user.updateOne({ $pull: { posts: post._id } });
-
-    post.userId = null;
-    await post.save();
-
-    res.status(200).json({ message: "The post has been deleted" });
-  } catch (e) {
-    res.status(500).json({ message: e.message });
-  }
-}
-
 export const anonymizePost = async (req, res, next) => {
   try {
     const ANONYMOUS_USER_ID = await getAnonymousUserId();
@@ -230,8 +198,10 @@ export const userPosts = async (req,res,next) => {
       return res.status(404).json({message: "User not found"})
     }
     const allPosts = await getPosts()
-    const posts = allPosts.filter(post => post.author._id.toString() === req.params.userId)
+    const posts = allPosts.filter(post => post.author._id?.toString() === req.params.userId)
+    console.log(posts)
     res.status(200).json(posts)
+
   }catch(e){
     console.log(e)
   }
@@ -433,6 +403,54 @@ export const downloadPost = async (req, res, next) => {
     res.status(500).json({ message: e.message });
   }
 };
+
+// Function to delete a file from S3
+const deleteFileFromS3 = async (fileKey) => {
+  try {
+    const params = {
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: fileKey,
+    };
+
+    // Create the command
+    const command = new DeleteObjectCommand(params);
+
+    // Send the command to delete the object
+    await s3Client.send(command);
+
+    console.log(`File with key ${fileKey} deleted successfully from S3`);
+    return { success: true, message: "File deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting file from S3:", error);
+    throw new Error("Error deleting file from S3");
+  }
+};
+
+export const deletePost = async (req, res, next) => {
+  try {
+    console.log("postid:",req.params.postId);
+    const post = await Post.findById(req.params.postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post doesn't exist!" });
+    }
+    if (req.user.id !== post.userId.toString()) {
+      return res.status(403).json({ message: "You're not allowed to delete this post" });
+    }
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found!" });
+    }
+    await user.updateOne({ $pull: { posts: post._id } });
+    await post.deleteOne({
+      _id: req.params.postId,
+    });
+    await deleteFileFromS3(post.fileKey);
+    res.status(200).json({ message: "The post has been deleted" });
+  } catch (e) {
+    console.log("here")
+    res.status(500).json({ message: e.message });
+  }
+}
 
 export const filterPost = async (req, res, next) => {
   try {
