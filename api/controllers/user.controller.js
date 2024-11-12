@@ -73,6 +73,7 @@ export const deleteUser = async (req,res,next) => {
 
         try{
             await User.findByIdAndDelete(req.user.id);
+            await Post.deleteMany({userId: req.user.id});
             res.clearCookie("token", {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === "production",
