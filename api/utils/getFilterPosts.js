@@ -63,7 +63,7 @@ const getFilterPosts = async ({ program, course, resourceType, semester, fileTyp
       },
       // Apply sort based on the `sort` parameter
       {
-        $sort: { createdAt: sort === "asc" ? 1 : -1 }
+        $sort: { createdAt: sort === "asc" ? -1 : 1 }
       }
     ]);
 
