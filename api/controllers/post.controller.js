@@ -296,7 +296,7 @@ const upload = multer({
       cb(null, fileName);
     },
   }),
-  limits: { fileSize: 5000000 }, // 5 MB file size limit
+  limits: { fileSize: 10000000 }, // 10 MB file size limit
   fileFilter(req, file, cb) {
     if (!file.originalname.match(/\.(jpeg|jpg|png|webp|pdf|doc|docx|xls|xlsx|ppt|pptx)$/)) {
       return cb(new Error("Unsupported file format"));

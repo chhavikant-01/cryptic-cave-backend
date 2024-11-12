@@ -8,7 +8,6 @@ dotenv.config();
 export const signup = async (req, res, next) => {
     try {
         const { firstname, lastname, email, password, program } = req.body;
-        console.log(req.body);
         const userEmail = await User.findOne({ email });
         const userUsername = email.split("@")[0];
 

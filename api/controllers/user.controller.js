@@ -29,7 +29,6 @@ export const logout = (req, res, next) => {
     }
 };
 export const updateUser = async (req, res, next) => {
-    console.log(req.body)
     try {
         const user = await User.findById(req.user.id).select("+password");
         if (!user) {
