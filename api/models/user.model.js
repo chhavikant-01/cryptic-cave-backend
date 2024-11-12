@@ -45,6 +45,10 @@ const userSchema = new mongoose.Schema(
             type: Array,
             default: [],
         },
+        blacklistedPosts: {
+            type: Array,
+            default: [],
+        },
         program: {
             type: String,
             default:"",

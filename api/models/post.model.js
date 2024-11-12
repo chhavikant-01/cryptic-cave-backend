@@ -19,6 +19,10 @@ const postSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
+    isBlacklisted: {
+        type: Boolean,
+        default: false,
+    },
     fileType: {
         type: String,
         // enum: ["ppt", "pdf", "doc", "txt", "png", "jpg", "jpeg"],
