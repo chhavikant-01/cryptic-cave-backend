@@ -5,9 +5,17 @@ import sendMail from "../utils/sendMail.js";
 import dotenv from "dotenv";
 dotenv.config();
 
+const validDomain = process.env.EMAIL_ALLOWED_DOMAIN;
+
 export const signup = async (req, res, next) => {
     try {
         const { firstname, lastname, email, password, program } = req.body;
+        if (!firstname || !lastname || !email || !password || !program) {
+            return res.status(400).json({ message: "Please enter all fields" });
+        }   
+        if(email.split("@")[1] !== validDomain){
+            return res.status(400).json({message: "Please use a valid email address"})
+        }
         const userEmail = await User.findOne({ email });
         const userUsername = email.split("@")[0];
 
@@ -161,6 +169,10 @@ export const login = async (req, res, next) => {
 
         if(!email || !password){
             return res.status(400).json({message: "Please enter all fields!"})
+        }
+
+        if(email.split("@")[1] !== validDomain){
+            return res.status(400).json({message: "Please use a valid email address"})
         }
 
         const user = await User.findOne({email}).select("+password");
