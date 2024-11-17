@@ -44,6 +44,7 @@ export const updateUser = async (req, res, next) => {
             if (req.body.program) user.program = req.body.program;
             if (req.body.yearOfGraduation) user.yearOfGraduation = req.body.yearOfGraduation;
             if(req.body.newPassword) user.password = req.body.newPassword;
+            if(req.body.professionalProfile) user.professionalProfile = req.body.professionalProfile;
         }
         
         await user.save();
