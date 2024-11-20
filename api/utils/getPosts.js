@@ -40,7 +40,7 @@ const getPosts = async () => {
                         name: { $concat: ["$author.firstname", " ", "$author.lastname"] },
                         profilePicture: "$author.profilePicture",
                         program: "$author.program",
-                        professionalProfile: "$author.professionalProfile",
+                        shareSpaceProfile: "$author.shareSpaceProfile",
                         yearOfGraduation: "$author.yearOfGraduation",
                         numberOfPosts: { $size: {$ifNull : ["$author.posts",[]] } },
                         numberOfFollowers: { $size: {$ifNull:["$author.followers",[]]} },

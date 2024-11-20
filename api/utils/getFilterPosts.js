@@ -56,7 +56,7 @@ const getFilterPosts = async ({ program, course, resourceType, semester, fileTyp
             profilePicture: "$author.profilePicture",
             program: "$author.program",
             yearOfGraduation: "$author.yearOfGraduation",
-            professionalProfile: "$author.professionalProfile",
+            shareSpaceProfile: "$author.shareSpaceProfile",
             numberOfPosts: { $size: { $ifNull: ["$author.posts", []] } },
             numberOfFollowers: { $size: { $ifNull: ["$author.followers", []] } },
           }

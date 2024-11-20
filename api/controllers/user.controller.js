@@ -213,3 +213,40 @@ export const getConnections = async (req,res,next) => {
         res.status(500).json({message: e.message})
     }
 }
+
+export const updateShareSpaceProfile = async (req,res,next) => {
+    try{
+        const user = await User.findById(req.user.id)
+        if(!user){
+            res.status(404).json({message: "User not found!"})
+        }
+        if(!req.body.profile){
+            res.status(404).json({message: "Profile type not found!"})
+        }
+        if(req.body.profile ==="personal" || req.body.profile ==="professional"){
+            user.shareSpaceProfile.profileType = req.body.profile
+            await user.save()
+        }
+        res.status(201).json({message: "Profile updated!", profile: user.shareSpaceProfile})
+
+    }catch(e){
+        res.status(500).json({message: e.message})
+    }
+}
+export const updateShareSpaceUsername = async (req,res,next) => {
+    try{
+        const user = await User.findById(req.user.id)
+        if(!user){
+            res.status(404).json({message: "User not found!"})
+        }
+        if(!req.body.username){
+            res.status(404).json({message: "Profile username not found!"})
+        }
+        user.shareSpaceProfile.username = req.body.username
+        await user.save()
+        res.status(201).json({message: "Profile updated!", profile: user.shareSpaceProfile})
+
+    }catch(e){
+        res.status(500).json({message: e.message})
+    }
+}

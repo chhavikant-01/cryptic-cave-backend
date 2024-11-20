@@ -29,9 +29,15 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: "",
         },
-        professionalProfile: {
-            type: String,
-            default: "",
+        shareSpaceProfile: {
+            username: {
+                type: String,
+                default: ""
+            },
+            profileType: {
+                type: String,
+                default: ""
+            }
         },
         followers: [{
             type: mongoose.Schema.Types.ObjectId,

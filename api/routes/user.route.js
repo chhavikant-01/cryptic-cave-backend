@@ -7,7 +7,10 @@ import { logout,
          unfollowUser, 
          allUsers,
          userPosts,
-         getConnections } 
+         getConnections,
+         updateShareSpaceProfile,
+         updateShareSpaceUsername
+         } 
     from "../controllers/user.controller.js"
 import { isAuthenticated } from "../middleware/auth.js"
 
@@ -23,4 +26,6 @@ router.put("/:userId/follow", isAuthenticated, followUser )
 router.put("/:userId/unfollow", isAuthenticated, unfollowUser)
 router.get("/:userId/posts", userPosts)
 router.get("/", allUsers)
+router.put("/update-share-space-profile", isAuthenticated, updateShareSpaceProfile)
+router.put("/update-share-space-username", isAuthenticated, updateShareSpaceUsername)
 export default router
