@@ -193,3 +193,156 @@ export const login = async (req, res, next) => {
         res.status(500).json({message: e.message})
     }
 }
+
+export const forgotPassword = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+
+        // Check if email is provided
+        if (!email) {
+            return res.status(400).json({ message: "Please provide your email address" });
+        }
+
+        // Find the user by email
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: "User with this email does not exist" });
+        }
+
+        // Generate a reset token
+        const resetToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "15m" });
+
+        // Construct the reset password URL
+        const resetPasswordUrl = `${process.env.FRONTEND_BASE_URL}/reset-password/${resetToken}`;
+
+        const htmlMessage = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f4f4f4;
+                    margin: 0;
+                    padding: 0;
+                }
+                .container {
+                    max-width: 600px;
+                    margin: 0 auto;
+                    background-color: #ffffff;
+                    padding: 20px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                }
+                .header {
+                    background-color: #4CAF50;
+                    color: white;
+                    text-align: center;
+                    padding: 10px 0;
+                }
+                .header h1 {
+                    margin: 0;
+                    font-size: 24px;
+                }
+                .content {
+                    padding: 20px;
+                    text-align: center;
+                }
+                .content p {
+                    font-size: 16px;
+                    line-height: 1.5;
+                    margin: 20px 0;
+                }
+                .button {
+                    display: inline-block;
+                    padding: 10px 20px;
+                    font-size: 16px;
+                    color: white;
+                    background-color: #4CAF50;
+                    text-decoration: none;
+                    border-radius: 5px;
+                }
+                .footer {
+                    background-color: #f1f1f1;
+                    text-align: center;
+                    padding: 10px;
+                    font-size: 12px;
+                    color: #888;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Password Reset</h1>
+                </div>
+                <div class="content">
+                    <p>Hello, ${user.firstname}</p>
+                    <p>You requested to reset your password. Please click the button below to proceed.</p>
+                    <a href="${resetPasswordUrl}" class="button">Reset Password</a>
+                </div>
+                <div class="footer">
+                    <p>&copy; 2024 Cryptic Cave. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        `;
+
+        // Send the reset email
+        await sendMail({
+            email: user.email,
+            subject: "Password Reset Request",
+            htmlMessage,
+            message: `Hello ${user.firstname}, click on the link to reset your password: ${resetPasswordUrl}`, // Fallback plain text
+        });
+
+        res.status(200).json({ 
+            message: `A password reset email has been sent to ${user.email}. Please check your inbox.` 
+        });
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const resetPassword = async (req, res, next) => {
+    try {
+        const { token } = req.params;
+        const { newPassword } = req.body;
+
+        // Validate token
+        if (!token) {
+            return res.status(400).json({ message: "Invalid or missing token" });
+        }
+
+        // Validate new password
+        if (!newPassword || newPassword.length < 6) {
+            return res.status(400).json({ message: "Password must be at least 6 characters long" });
+        }
+
+        // Verify the token
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            return res.status(400).json({ message: "Invalid or expired token" });
+        }
+
+        // Find user by ID in the token
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Update the user's password
+        user.password = newPassword; // Assume `password` is hashed in the User model's pre-save hook
+        await user.save();
+
+        res.status(200).json({ message: "Password reset successfully. You can now log in with your new password." });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
