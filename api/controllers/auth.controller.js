@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import sendToken from "../utils/jwtToken.js";
 import jwt from "jsonwebtoken";
 import sendMail from "../utils/sendMail.js";
+import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -9,8 +10,8 @@ const validDomain = process.env.EMAIL_ALLOWED_DOMAIN;
 
 export const signup = async (req, res, next) => {
     try {
-        const { firstname, lastname, email, password, program } = req.body;
-        if (!firstname || !lastname || !email || !password || !program) {
+        const { firstname, lastname, email, password } = req.body;
+        if (!firstname || !lastname || !email || !password) {
             return res.status(400).json({ message: "Please enter all fields" });
         }   
         if(email.split("@")[1] !== validDomain){
@@ -29,7 +30,6 @@ export const signup = async (req, res, next) => {
             email,
             password,
             username: userUsername,
-            program,
         };
 
         const createActivationToken = (user) => {
@@ -37,7 +37,7 @@ export const signup = async (req, res, next) => {
         };
 
         const activationToken = createActivationToken(user);
-        const activationUrl = `${process.env.BASE_URL}/api/v1/auth/activation/${activationToken}`;
+        const activationUrl = `${process.env.FRONTEND_BASE_URL}/auth/activation/${activationToken}`;
         const htmlMessage = `
         <!DOCTYPE html>
         <html>
@@ -345,4 +345,36 @@ export const resetPassword = async (req, res, next) => {
     }
 };
 
+  
+  export const google = async (req, res, next) => {
+    const { email, name, googlePhotoUrl } = req.body;
+
+    if(email.split("@")[1] !== validDomain){
+        return res.status(400).json({message: "Please use a valid email address"})
+    }
+    try {
+      const user = await User.findOne({ email }).select("+password");;
+      if (user) {
+        sendToken(user,200,res)
+      } else {
+        const generatedPassword =
+          Math.random().toString(36).slice(-8) +
+          Math.random().toString(36).slice(-8);
+        
+        const newUser = new User({
+            firstname: name.split(" ")[0] ,
+            lastname: name.split(" ")[1] ,
+          username: email.split("@")[0],
+          email,
+          password: generatedPassword,
+          profilePicture: googlePhotoUrl,
+        });
+        await newUser.save();
+
+        sendToken(newUser,200,res)
+      }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+  };
 

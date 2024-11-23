@@ -1,6 +1,5 @@
 
 const sendToken = (user, statusCode, res) => {
-
     const token = user.getJwtToken();
     const { password, ...rest } = user._doc
 

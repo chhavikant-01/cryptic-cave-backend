@@ -9,7 +9,8 @@ import { logout,
          userPosts,
          getConnections,
          updateShareSpaceProfile,
-         updateShareSpaceUsername
+         updateShareSpaceUsername,
+         onboarding
          } 
     from "../controllers/user.controller.js"
 import { isAuthenticated } from "../middleware/auth.js"
@@ -18,6 +19,7 @@ import { isAuthenticated } from "../middleware/auth.js"
 const router = express.Router()
 
 router.post("/logout", logout)
+router.post("/onboarding", isAuthenticated, onboarding)
 router.put("/update-user", isAuthenticated, updateUser )
 router.delete("/delete-user", isAuthenticated, deleteUser )
 router.get("/:userId", getUser)

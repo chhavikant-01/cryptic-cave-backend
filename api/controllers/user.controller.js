@@ -250,3 +250,25 @@ export const updateShareSpaceUsername = async (req,res,next) => {
         res.status(500).json({message: e.message})
     }
 }
+
+export const onboarding = async (req,res,next) => {
+    try{
+        const { program, graduationYear, username } = req.body;
+        const user = await User.findById(req.user.id);
+        if(!user){
+            res.status(404).json({message: "User not found!"})
+        }
+        if(!program || !graduationYear){
+            res.status(404).json({message: "Please fill all fields!"})
+        }
+        user.program = program;
+        user.yearOfGraduation = graduationYear;
+        user.shareSpaceProfile.username = username;
+        user.isOnboarded = true;
+        await user.save();
+        res.status(201).json({message: "Onboarding successful!", user: user})
+
+    }catch(e){
+        res.status(500).json({message: e.message})
+    }
+}

@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        isOnboarded:{
+            type: Boolean,
+            default: false,
+        },
         posts: {
             type: Array,
             default: [],
