@@ -3,6 +3,7 @@ import connectDB from "./database/db.js";
 import authRoutes from "./routes/auth.route.js";
 import userRoutes from "./routes/user.route.js";
 import postRoutes from "./routes/post.route.js"
+import recosRoutes from "./routes/recos.route.js";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -43,6 +44,7 @@ app.use(cookieParser());
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/posts", postRoutes);
+app.use("/api/v1/recos", recosRoutes);
 
 app.get("/", (req, res)=>{
     res.send("Hello World");
