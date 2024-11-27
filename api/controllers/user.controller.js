@@ -174,7 +174,7 @@ export const unfollowUser = async (req,res,next) => {
 export const allUsers = async (req,res,next) => {
     
     try {
-        const data = await User.find();
+        const data = await User.find().select('firstname lastname email _id');
         res.status(200).json(data);
       } catch (err) {
         res.status(404).json({message: err.message});
@@ -266,8 +266,7 @@ export const onboarding = async (req,res,next) => {
         if(username) user.shareSpaceProfile.username = username;
         user.isOnboarded = true;
         await user.save();
-        const newUser = await User.findById(req.user.id);
-        res.status(201).json({message: "Onboarding successful!", user: newUser})
+        res.status(201).json({message: "Onboarding successful!", user: user})
 
     }catch(e){
         res.status(500).json({message: e.message})

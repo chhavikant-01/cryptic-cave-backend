@@ -29,7 +29,7 @@ connectDB(URL);
 app.use(express.json());
 app.use(cors(
     {
-        origin: ["https://www.linkuni.in",`http://localhost:${process.env.LOCAL_PORT}`],
+        origin: ["https://www.linkuni.in",`http://localhost:${process.env.LOCAL_PORT}`, `${process.env.ADMIN_URL}`],
         methods: ["GET","POST","DELETE", "PUT"],
         credentials: true,
         // allowedHeaders:[],
