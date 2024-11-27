@@ -266,7 +266,8 @@ export const onboarding = async (req,res,next) => {
         user.shareSpaceProfile.username = username;
         user.isOnboarded = true;
         await user.save();
-        res.status(201).json({message: "Onboarding successful!", user: user})
+        const newUser = await User.findById(req.user.id);
+        res.status(201).json({message: "Onboarding successful!", user: newUser})
 
     }catch(e){
         res.status(500).json({message: e.message})
