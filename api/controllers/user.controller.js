@@ -174,7 +174,7 @@ export const unfollowUser = async (req,res,next) => {
 export const allUsers = async (req,res,next) => {
     
     try {
-        const data = await User.find().select('firstname lastname email _id');
+        const data = await User.find().select('firstname lastname email _id program');
         res.status(200).json(data);
       } catch (err) {
         res.status(404).json({message: err.message});
