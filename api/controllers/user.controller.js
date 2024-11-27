@@ -263,7 +263,7 @@ export const onboarding = async (req,res,next) => {
         }
         user.program = program;
         user.yearOfGraduation = graduationYear;
-        user.shareSpaceProfile.username = username;
+        if(username) user.shareSpaceProfile.username = username;
         user.isOnboarded = true;
         await user.save();
         const newUser = await User.findById(req.user.id);
