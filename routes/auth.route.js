@@ -11,7 +11,7 @@ router.post("/forgot-password", forgotPassword)
 router.post("/reset-password/:token", resetPassword);
 router.post("/google", google);
 router.get("/",isAuthenticated,(req, res)=>{
-    res.json("Hello World");
+    return res.json("Hello World");
 })
 
 export default router;
