@@ -48,7 +48,7 @@ const storage = multer.diskStorage({
 
 const router = express.Router();
 
-router.get("/", allPosts)
+router.get("/",isAuthenticated, allPosts)
 router.get("/all-post/:userId", userPosts)
 router.get("/saved/:userId", savedPosts)
 // router.post("/create-post", isAuthenticated, createPost)

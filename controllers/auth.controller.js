@@ -378,3 +378,16 @@ export const resetPassword = async (req, res, next) => {
     }
   };
 
+export const sessionAuth = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id
+        );
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+        res.status(200).json({ userId: user._id});
+    }catch(e){
+        res.status(500).json({message: e.message})
+    }
+}
+
